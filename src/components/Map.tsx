@@ -12,43 +12,43 @@ const zigzagPath = [
   { lat: 24.8600, lng: 67.0050 }
 ];
 
-const arrowSymbol: google.maps.Symbol = {
-  path: window.google?.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-  scale: 3,
-  strokeColor: "#0000FF",
-};
-
-const circleSymbol: google.maps.Symbol = {
-  path: window.google?.maps.SymbolPath.CIRCLE,
-  scale: 5,
-  fillColor: "#0000FF",
-  fillOpacity: 1,
-  strokeColor: "#0000FF",
-  strokeWeight: 1
-};
 
 export default function Map() {
   const [hoverPos, setHoverPos] = useState<{ lat: number, lng: number } | null>(null);
-
+  const [arrowSymbol, setArrowSymbol] = useState<google.maps.Symbol | null>(null);
+  const [circleSymbol, setCircleSymbol] = useState<google.maps.Symbol | null>(null);
 
   return (
-    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+    <LoadScript
+      googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+      onLoad={() => {
+        setArrowSymbol({
+          path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+          scale: 3,
+          strokeColor: "#0000FF"
+        });
+        setCircleSymbol({
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 5,
+          fillColor: "#0000FF",
+          fillOpacity: 1,
+          strokeColor: "#0000FF",
+          strokeWeight: 1
+        });
+      }}
+    >
       <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={15}>
         {zigzagPath.map((point, index) => {
           if (index < zigzagPath.length - 1) {
             const segment = [zigzagPath[index], zigzagPath[index + 1]];
             const firstSegment = index === 0;
             const isLastSegment = index === zigzagPath.length - 1;
-
-            // Explicitly type iAconsArray for TypeScript
             let iconsArray: google.maps.IconSequence[] = [];
-
             if (firstSegment) {
-              iconsArray = [{ icon: circleSymbol, offset: "1%" }];
+              iconsArray = circleSymbol ? [{ icon: circleSymbol, offset: "1%" }] : [];
             } else if (!isLastSegment) {
-              iconsArray = [{ icon: arrowSymbol, offset: "5%" }];
+              iconsArray = arrowSymbol ? [{ icon: arrowSymbol, offset: "5%" }] : [];
             }
-
             return (
               <>
                 <Polyline
@@ -63,7 +63,6 @@ export default function Map() {
                     icons: iconsArray
                   }}
                 />
-
                 {hoverPos && (
                   <InfoWindow position={hoverPos}>
                     <div>
@@ -74,11 +73,9 @@ export default function Map() {
                 )}
               </>
             );
-
           }
           return null;
         })}
-
         <Marker position={zigzagPath[zigzagPath.length - 1]} label="End" onMouseOver={() => setHoverPos(zigzagPath[zigzagPath.length - 1])}
           onMouseOut={() => setHoverPos(null)} />
       </GoogleMap>
