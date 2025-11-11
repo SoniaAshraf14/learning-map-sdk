@@ -1,11 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import GetMapORS from './components/GetMapORS'
 // import './index.css'
 // import App from './App.tsx'
-import MapORS from './components/MapORS.tsx'
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MapORS/>
+    <GetMapORS/>
   </StrictMode>,
 )
